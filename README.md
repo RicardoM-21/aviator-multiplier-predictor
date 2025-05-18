@@ -1,1 +1,1 @@
-# aviator-multiplier-predictor
+aviator-multiplier-predictor
