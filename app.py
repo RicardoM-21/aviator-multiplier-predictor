@@ -1,41 +1,53 @@
 import streamlit as st
 import random
+import pandas as pd
+import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="Previsão Aviator", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="🔮 Previsão Aviator", layout="centered")
 
-# Estilo dark personalizado
+# Estilo escuro
 st.markdown("""
-    <style>
-        body { background-color: #0e1117; color: white; }
-        .stApp { background-color: #0e1117; }
-    </style>
+<style>
+body {
+    background-color: #0e1117;
+    color: white;
+}
+.stApp {
+    background-color: #0e1117;
+}
+</style>
 """, unsafe_allow_html=True)
 
-st.title("🎯 Previsão de Multiplicadores - Aviator")
-st.write("Veja a previsão de entradas e acompanhe estatísticas de acertos.")
+# Título
+st.title("✈️ Aviator: Previsão de Multiplicadores")
 
-# Simulação de previsão
+st.write("Veja abaixo as previsões e o gráfico com os últimos multiplicadores simulados.")
+
+# Função de previsão
 def prever_multiplicador():
-    return round(random.uniform(2.0, 50.0), 2)
+    return round(random.uniform(1.0, 50.0), 2)
 
-# Histórico de previsões
-if "historico" not in st.session_state:
-    st.session_state.historico = []
+# Simular histórico
+historico = [round(random.uniform(1.0, 50.0), 2) for _ in range(10)]
 
-# Nova previsão
-if st.button("🔮 Gerar Previsão"):
-    novo = prever_multiplicador()
-    st.session_state.historico.append(novo)
+# Mostrar gráfico
+st.subheader("📊 Últimos Multiplicadores (Simulados)")
+df = pd.DataFrame(historico, columns=["Multiplicador"])
+df["Rodada"] = range(1, 11)
 
-# Estatísticas
-if st.session_state.historico:
-    acertos = len([x for x in st.session_state.historico if x >= 2])
-    total = len(st.session_state.historico)
-    st.metric("✅ Acertos (>=2x)", f"{acertos}/{total}")
-    st.line_chart(st.session_state.historico)
+fig, ax = plt.subplots()
+cores = ['green' if x >= 10 else 'red' for x in df["Multiplicador"]]
+ax.bar(df["Rodada"], df["Multiplicador"], color=cores)
+ax.set_xlabel("Rodada")
+ax.set_ylabel("Multiplicador")
+ax.set_title("Histórico de Entradas")
+st.pyplot(fig)
 
-    st.subheader("📜 Histórico de Previsões")
-    st.write(st.session_state.historico)
-else:
-    st.info("Clique no botão acima para gerar sua primeira previsão.")
-  
+# Previsão nova
+st.subheader("🔮 Próxima Previsão")
+proximo = prever_multiplicador()
+st.metric("Multiplicador Estimado", f"{proximo}x", delta=None)
+
+# Desempenho (simples)
+acertos = sum(1 for m in historico if m >= 10)
+st.write(f"🎯 Entradas Altas (≥10x): {acertos} de 10")
